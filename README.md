@@ -22,28 +22,29 @@ Comparing a pre-INT period (Nov-23 - Feb-24) against the INT period (Nov-24 - Fe
 
 1. Have the demographics of Heartlands A&E attenders changed?  Consider geography (LSOA -> Locality), age, acuity (ECDS4 - ), sex, deprivation and ethnicity.
 
-  - Look at all Heartlands A&E attenders in CDS.
+    - Look at all Heartlands A&E attenders in CDS.
   
-  - Consider factors: geography (LSOA -> Locality), age, sex, acuity of some sort (acuity of NEWS if available), deprivation and ethnicity.
+    - Consider factors: geography (LSOA -> Locality), age, sex, acuity of some sort (acuity of NEWS if available), deprivation and ethnicity.
 
 2. Has community activity increased for HISU patients? 
   
-  - Need a HISU/INT patient list to trace in systems
+    - Need a HISU/INT patient list to trace in systems
   
-  -	What systems would this activity be recorded in? Community service? Ambulance? UEC? Mental Health?
+    -	What systems would this activity be recorded in? Community service? Ambulance? UEC? Mental Health?
   
-  - Likely need to be done via join ICB / BCHC analyst using BCHC linked data.
+    - Likely need to be done via join ICB / BCHC analyst using BCHC linked data.
 
 3. Has emergency care activity decreased for HISU patients?
-  - Again, dependent on patient list and needs joint ICB BCHC analyst
+    
+    - Again, dependent on patient list and needs joint ICB BCHC analyst
   
 4. How has the case-mix of emergency admissions changed?  Age, Sex, ethnicity, deprivation, admitting condition, co-morbidity/frailty?
   
-  - All emergency admissions in period.
+    - All emergency admissions in period.
   
-  - Include age, sex, ethnicity, deprivation, admitting condition, co-morbidity/frailty?
+    - Include age, sex, ethnicity, deprivation, admitting condition, co-morbidity/frailty?
   
-  - Likely statistical model:  multiple correspondence analysis (and load factors on components), or if features are simple enough, logistic regression.
+    - Likely statistical model:  multiple correspondence analysis (and load factors on components), or if features are simple enough, logistic regression.
 
 
 
