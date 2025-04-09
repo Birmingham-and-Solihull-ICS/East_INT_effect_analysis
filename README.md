@@ -49,4 +49,4 @@ Comparing a pre-INT period (Nov-23 - Feb-24) against the INT period (Nov-24 - Fe
 
 
 
-This repository is dual licensed under the [Open Government v3]([https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) & MIT. All code can outputs are subject to Crown Copyright.
+This repository is dual licensed under the [Open Government v3]([https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) & MIT. All code and outputs are subject to Crown Copyright.
