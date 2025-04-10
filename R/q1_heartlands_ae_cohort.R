@@ -91,6 +91,7 @@ ecds |>
 
 
 
+
 ecds |> 
   group_by(period) |> 
   summarise(attendances = n())
