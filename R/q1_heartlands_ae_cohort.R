@@ -10,6 +10,7 @@ sql1 <-
   "Select
   ArrivalMode,
   ArrivalModeDescription,
+  ArrivalDate,
   AgeAtActivityDate,
   GenderCode,
   GenderDescription,
@@ -39,6 +40,7 @@ sql1 <-
   
   Select ArrivalMode,
   ArrivalModeDescription,
+  ArrivalDate,
   AgeAtActivityDate,
   GenderCode,
   GenderDescription,
@@ -72,4 +74,14 @@ ecds <- dbGetQuery(con, sql1)
 ecds |> 
   group_by(period) |> 
   summarise(attendances = n())
-# More attendances in the INT period, so not as simple as straigh numeric comparison 
+# More attendances in the INT period, so not as simple as straight numeric comparison 
+
+ecds |> 
+  group_by()
+  ggplot(aes(y=))
+
+
+
+ecds |> 
+  group_by(period) |> 
+  summarise(attendances = n())
