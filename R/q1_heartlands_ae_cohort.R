@@ -142,7 +142,15 @@ ecds |>
 # Chief complaint
 ecds |> 
   group_by(period, ChiefComplaintGroup) |> 
-  summarise(attendances = n())  
+  summarise(attendances = n())  |> 
+  ggplot(aes(y=attendances, x= ChiefComplaintGroup, fill = period))+
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_bsol()+
+  scale_x_discrete("Chief Complaint Group"
+                   ,labels = function(x) str_wrap(x, width = 10)) +
+  scale_y_continuous("Attendances", labels = comma)+
+  theme(axis.text.x = element_text(size=6))
+
 
 # Arrival Mode
 ecds |> 
@@ -236,7 +244,7 @@ BIC(mod2)
 mod3 <- glm(IsAdmittedAsInpatient ~ AgeAtActivityDate +
               GenderDescription + 
               ArrivalModeDescription + 
-              EthnicCategoryDescription +
+              #EthnicCategoryDescription +
               AcuityECDSDescription +
               Locality +
               ChiefComplaintGroup +
