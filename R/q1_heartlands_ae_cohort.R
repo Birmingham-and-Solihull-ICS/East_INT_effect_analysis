@@ -102,31 +102,74 @@ ecds |>
 ecds |> 
   group_by(ArrivalDate, period) |> 
   summarise(attendances = n()) |> 
+  mutate(ArrivalDate = as.Date(ArrivalDate)) |> 
   ggplot(aes(y=attendances, x=ArrivalDate, colour=period, group=period))+
   geom_line()+
-  scale_color_bsol()
+  geom_smooth()+
+  scale_color_bsol() +
+  scale_x_date(date_labels = "%b %y", date_breaks = "1 month") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 
 # Age at admission
 
-
+## Histogram
 ecds |> 
   ggplot(aes(x=AgeAtActivityDate, colour=period, fill=period, group=period))+
-  geom_histogram(position = position_identity(), alpha=0.5)+
+  geom_histogram(position = position_identity(), alpha=0.5, binwidth = 5)+
   scale_color_bsol()+
-  scale_fill_bsol()
+  scale_fill_bsol()+
+  scale_x_continuous(breaks = seq(0,130,10))
+
+### Percentage in age groups
+ecds |> 
+  group_by(AgeAtActivityDate, period) |> 
+  summarise(pts = n()) |> 
+  group_by(period) |> 
+  mutate(percent = pts / sum(pts)) |> 
+  ggplot(aes(x=AgeAtActivityDate, y = percent, colour=period, fill=period, group=period))+
+  geom_col(position = position_identity(), alpha=0.5)+
+  scale_color_bsol()+
+  scale_fill_bsol()+
+  scale_x_continuous(breaks = seq(0,130,10)) +
+  scale_y_continuous(labels = percent)
 
 
+# Count in ages
 ecds |> 
   group_by(AgeAtActivityDate) |> 
   summarise(attendances = n()) |> 
   arrange(desc(AgeAtActivityDate))
 
-summary(ecds$AgeAtActivityDate)
-
+# Five number summary by period
+ecds |> 
+  group_by(period) |> 
+  summarise(min = min(AgeAtActivityDate),
+            q25 = quantile(AgeAtActivityDate, 0.25),
+            mean = mean(AgeAtActivityDate),
+            median = median(AgeAtActivityDate),
+            q75 = quantile(AgeAtActivityDate, 0.75),
+            max = max(AgeAtActivityDate)
+            )
+  
 
 
 # Acuity
+## NUmbers
+
+ecds |> 
+  group_by(period, AcuityECDSDescription) |> 
+  summarise(attendances = n()) |> 
+  ggplot(aes(y=attendances, x= AcuityECDSDescription, fill = period))+
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_bsol()+
+  scale_x_discrete("Acuity Description"
+                   ,labels = function(x) str_wrap(x, width = 10)) +
+  scale_y_continuous("Percentage of attendances", labels = comma)+
+  theme(axis.text.x = element_text(size=8))
+
+
+## percent
 ecds |> 
   group_by(period, AcuityECDSDescription) |> 
   summarise(attendances = n()) |> 
@@ -137,12 +180,43 @@ ecds |>
   scale_x_discrete("Acuity Description"
                    ,labels = function(x) str_wrap(x, width = 10)) +
   scale_y_continuous("Percentage of attendances", labels = percent)+
-  theme(axis.text.x = element_text(size=6))
+  theme(axis.text.x = element_text(size=8))
+
+
 
 # Chief complaint
+## numbers
 ecds |> 
   group_by(period, ChiefComplaintGroup) |> 
-  summarise(attendances = n())  
+  summarise(attendances = n())  |> 
+  ggplot(aes(y=attendances, x= ChiefComplaintGroup, fill = period))+
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_bsol()+
+  scale_x_discrete("Chief Complaint Group"
+                   ,labels = function(x) str_wrap(x, width = 10)
+                   #, guide = guide_axis(n.dodge = 2)
+                   ) +
+  scale_y_continuous("Attendances", labels = comma)+
+  theme(axis.text.x = element_text(size=7, angle = 90))
+
+
+## percent
+
+ecds |> 
+  group_by(period, ChiefComplaintGroup) |> 
+  summarise(attendances = n())  |> 
+  group_by(period) |> 
+  mutate(percent = attendances / sum(attendances)) |> 
+  ggplot(aes(y = percent, x= ChiefComplaintGroup, fill = period))+
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_bsol()+
+  scale_x_discrete("Chief Complaint Group"
+                   ,labels = function(x) str_wrap(x, width = 10)
+                   #, guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_y_continuous("Attendances", labels = percent)+
+  theme(axis.text.x = element_text(size=7, angle = 90))
+
 
 # Arrival Mode
 ecds |> 
@@ -155,6 +229,8 @@ ecds |>
   scale_x_discrete("Arrival Mode",labels = function(x) str_wrap(x, width = 10)) +
   scale_y_continuous("Percentage of attendances", labels = percent)+
   theme(axis.text.x = element_text(size=6))
+
+
 
 # Locality
 ecds |> 
@@ -197,14 +273,15 @@ locality_att |>
   scale_y_continuous("Attendances", labels = comma)
 
 
-# first regression
-
+# first regressions
+# Looking at admissions
 # Number of events - min 10 per variable.
 
 
 # acuity, age, locality, and chance of being admitted
 library(ModelMetrics)
 
+# Age and gender affect admission
 mod1 <- glm(IsAdmittedAsInpatient ~ AgeAtActivityDate +
               factor(GenderDescription) + 
               ##ArrivalModeDescription + EthnicCategoryDescription +
@@ -216,7 +293,7 @@ mod1 <- glm(IsAdmittedAsInpatient ~ AgeAtActivityDate +
 summary(mod1)
 
 auc(mod1)
-
+# Risk of being admitted, by locality before and after
 mod2 <- glm(IsAdmittedAsInpatient ~ AgeAtActivityDate +
               GenderDescription + 
               ArrivalModeDescription + 
@@ -236,7 +313,7 @@ BIC(mod2)
 mod3 <- glm(IsAdmittedAsInpatient ~ AgeAtActivityDate +
               GenderDescription + 
               ArrivalModeDescription + 
-              EthnicCategoryDescription +
+              #EthnicCategoryDescription +
               AcuityECDSDescription +
               Locality +
               ChiefComplaintGroup +
@@ -251,6 +328,30 @@ BIC(mod3)
 
 # Check overdispersion
 sum(mod3$weights * mod3$residuals^2)/mod3$df.residual
+
+
+library(gtsummary)
+
+mod2east <- glm(IsAdmittedAsInpatient ~ AgeAtActivityDate +
+              GenderDescription + 
+              ArrivalModeDescription + 
+              EthnicCategoryDescription +
+              AcuityECDSDescription +
+              #Locality +
+              period
+            ,data=ecds
+            , family = "binomial"
+            , subset = ecds$Locality == "East")
+
+summary(mod2east)
+
+tbl_regression(mod2east, exponentiate = TRUE, show_single_row = c("GenderDescription", "period"))
+
+auc(mod2east)
+BIC(mod2east)
+
+
+
 
 
 # Mod 3 first's bias reduction
